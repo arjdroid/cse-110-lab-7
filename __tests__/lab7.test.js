@@ -106,28 +106,45 @@ describe('Basic user flow for Website', () => {
   }, 10000);
 
   // Check to make sure that after you reload the page it remembers all of the items in your cart
-  it.skip('Checking number of items in cart on screen after reload', async () => {
+  it('Checking number of items in cart on screen after reload', async () => {
     console.log('Checking number of items in cart on screen after reload...');
 
     /**
-     **** TODO - STEP 4 **** 
+     **** STEP 4 ****
      * Reload the page, then select all of the <product-item> elements, and check every
        element to make sure that all of their buttons say "Remove from Cart".
      * Also check to make sure that #cart-count is still 20
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
 
+    await page.reload();
+
+    const allRemove = await page.$$eval('product-item', items => {
+      return items.every(item => {
+        const button = item.shadowRoot.querySelector('button');
+        return button.innerText === 'Remove from Cart';
+      });
+    });
+    expect(allRemove).toBe(true);
+
+    const cartCount = await page.$('#cart-count');
+    const count = await (await cartCount.getProperty('innerText')).jsonValue();
+    expect(count).toBe('20');
+
   }, 10000);
 
   // Check to make sure that the cart in localStorage is what you expect
-  it.skip('Checking the localStorage to make sure cart is correct', async () => {
+  it('Checking the localStorage to make sure cart is correct', async () => {
 
     /**
-     **** TODO - STEP 5 **** 
-     * At this point the item 'cart' in localStorage should be 
+     **** STEP 5 ****
+     * At this point the item 'cart' in localStorage should be
        '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]', check to make sure it is
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+
+    const cart = await page.evaluate(() => localStorage.getItem('cart'));
+    expect(cart).toBe('[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]');
 
   });
 
