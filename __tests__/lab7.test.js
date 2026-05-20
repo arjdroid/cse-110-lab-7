@@ -19,8 +19,6 @@ describe('Basic user flow for Website', () => {
   });
 
   // Check to make sure that all 20 <product-item> elements have data in them
-  // We use .skip() here because this test has a TODO that has not been completed yet.
-  // Make sure to remove the .skip after you finish the TODO. 
   it('Make sure <product-item> elements are populated', async () => {
     console.log('Checking to make sure <product-item> elements are populated...');
 
@@ -34,6 +32,13 @@ describe('Basic user flow for Website', () => {
         return data = item.data;
       });
     });
+
+    /**
+    **** STEP 1 ****
+    * Right now this function is only checking the first <product-item> it found, make it so that
+      it checks every <product-item> it found
+    * Remove the .skip from this it once you are finished writing this test.
+    */
 
     // Make sure the title, price, and image are populated in the JSON
     for (let i = 0; i < prodItemsData.length; i++) {
@@ -54,6 +59,15 @@ describe('Basic user flow for Website', () => {
   it('Clicking the "Add to Cart" button should change button text', async () => {
     console.log('Checking the "Add to Cart" button...');
 
+    /**
+     **** STEP 2 ****
+     * Query a <product-item> element using puppeteer ( checkout page.$() and page.$$() in the docs )
+     * Grab the shadowRoot of that element (it's a property), then query a button from that shadowRoot.
+     * Once you have the button, you can click it and check the innerText property of the button.
+     * Once you have the innerText property, use innerText.jsonValue() to get the text value of it
+     * Remember to remove the .skip from this it once you are finished writing this test.
+     */
+
     const firstItem = await page.$('product-item');
     const shadowRoot = await firstItem.getProperty('shadowRoot');
     const button = await shadowRoot.$('button');
@@ -66,16 +80,28 @@ describe('Basic user flow for Website', () => {
 
   // Check to make sure that after clicking "Add to Cart" on every <product-item> that the Cart
   // number in the top right has been correctly updated
-  it.skip('Checking number of items in cart on screen', async () => {
+  it('Checking number of items in cart on screen', async () => {
     console.log('Checking number of items in cart on screen...');
 
     /**
-     **** TODO - STEP 3 **** 
+     **** STEP 3 ****
      * Query select all of the <product-item> elements, then for every single product element
        get the shadowRoot and query select the button inside, and click on it.
      * Check to see if the innerText of #cart-count is 20
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+
+    await page.$$eval('product-item', items => {
+      items.forEach(item => {
+        const button = item.shadowRoot.querySelector('button');
+        if (button.innerText === 'Add to Cart') {
+          button.click();
+        }
+      });
+    });
+    const cartCount = await page.$('#cart-count');
+    const count = await (await cartCount.getProperty('innerText')).jsonValue();
+    expect(count).toBe('20');
 
   }, 10000);
 
