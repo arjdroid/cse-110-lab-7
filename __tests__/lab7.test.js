@@ -176,16 +176,30 @@ describe('Basic user flow for Website', () => {
 
   // Checking to make sure that it remembers us removing everything from the cart
   // after we refresh the page
-  it.skip('Checking number of items in cart on screen after reload', async () => {
+  it('Checking number of items in cart on screen after reload', async () => {
     console.log('Checking number of items in cart on screen after reload...');
 
     /**
-     **** TODO - STEP 7 **** 
+     **** STEP 7 ****
      * Reload the page once more, then go through each <product-item> to make sure that it has remembered nothing
        is in the cart - do this by checking the text on the buttons so that they should say "Add to Cart".
      * Also check to make sure that #cart-count is still 0
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+
+    await page.reload();
+
+    const allAdd = await page.$$eval('product-item', items => {
+      return items.every(item => {
+        const button = item.shadowRoot.querySelector('button');
+        return button.innerText === 'Add to Cart';
+      });
+    });
+    expect(allAdd).toBe(true);
+
+    const cartCount = await page.$('#cart-count');
+    const count = await (await cartCount.getProperty('innerText')).jsonValue();
+    expect(count).toBe('0');
 
   }, 10000);
 
