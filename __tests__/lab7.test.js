@@ -150,15 +150,27 @@ describe('Basic user flow for Website', () => {
 
   // Checking to make sure that if you remove all of the items from the cart that the cart
   // number in the top right of the screen is 0
-  it.skip('Checking number of items in cart on screen after removing from cart', async () => {
+  it('Checking number of items in cart on screen after removing from cart', async () => {
     console.log('Checking number of items in cart on screen...');
 
     /**
-     **** TODO - STEP 6 **** 
+     **** STEP 6 ****
      * Go through and click "Remove from Cart" on every single <product-item>, just like above.
      * Once you have, check to make sure that #cart-count is now 0
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+
+    await page.$$eval('product-item', items => {
+      items.forEach(item => {
+        const button = item.shadowRoot.querySelector('button');
+        if (button.innerText === 'Remove from Cart') {
+          button.click();
+        }
+      });
+    });
+    const cartCount = await page.$('#cart-count');
+    const count = await (await cartCount.getProperty('innerText')).jsonValue();
+    expect(count).toBe('0');
 
   }, 10000);
 
